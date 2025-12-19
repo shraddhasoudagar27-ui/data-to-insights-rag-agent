@@ -1,0 +1,13 @@
+employee_id,employee_name,department,region,month,sales_amount,units_sold
+E001,Alice,Sales,North,Jan,12000,40
+E002,Bob,Sales,South,Jan,9500,35
+E003,Charlie,Marketing,North,Jan,7000,20
+E004,Diana,HR,West,Jan,4000,10
+E005,Evan,Sales,East,Feb,15000,50
+E006,Fiona,Marketing,South,Feb,8200,22
+E007,George,Sales,North,Feb,11000,38
+E008,Hannah,HR,East,Feb,4200,12
+E009,Ian,Sales,West,Mar,17000,55
+E010,Jane,Marketing,North,Mar,9000,25
+E011,Kevin,Sales,South,Mar,13000,45
+E012,Laura,HR,West,Mar,3900,9
