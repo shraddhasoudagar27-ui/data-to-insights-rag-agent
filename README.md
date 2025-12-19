@@ -38,35 +38,40 @@ All numerical calculations are performed using Pandas, while an LLM is used **on
    cd data-to-insights-rag-agent
 
 2. Install dependencies:
+   ```bash
    pip install -r requirements.txt
 
-3. Add your Hugging Face API key:
+4. Add your Hugging Face API key:
    Create a file at:
+   ```bash
    .streamlit/secrets.toml
 
-   Add:
-   HF_API_KEY = "your_huggingface_api_key"
+ Add:
+ 
+    HF_API_KEY = "your_huggingface_api_key"
 
-4. Run the application:
+6. Run the application:
+   ```bash
    streamlit run app.py
 
 ### Sample Dataset
 
 The repository includes a sample CSV (sample.csv) with the following structure:
-
-employee_id,employee_name,department,region,month,sales_amount,units_sold
-E001,Alice,Sales,North,Jan,12000,40
-E002,Bob,Sales,South,Jan,9500,35
-E003,Charlie,Marketing,North,Jan,7000,20
-E004,Diana,HR,West,Jan,4000,10
-E005,Evan,Sales,East,Feb,15000,50
-E006,Fiona,Marketing,South,Feb,8200,22
-E007,George,Sales,North,Feb,11000,38
-E008,Hannah,HR,East,Feb,4200,12
-E009,Ian,Sales,West,Mar,17000,55
-E010,Jane,Marketing,North,Mar,9000,25
-E011,Kevin,Sales,South,Mar,13000,45
-E012,Laura,HR,West,Mar,3900,9
+```bash
+   employee_id,employee_name,department,region,month,sales_amount,units_sold
+   E001,Alice,Sales,North,Jan,12000,40
+   E002,Bob,Sales,South,Jan,9500,35
+   E003,Charlie,Marketing,North,Jan,7000,20
+   E004,Diana,HR,West,Jan,4000,10
+   E005,Evan,Sales,East,Feb,15000,50
+   E006,Fiona,Marketing,South,Feb,8200,22
+   E007,George,Sales,North,Feb,11000,38
+   E008,Hannah,HR,East,Feb,4200,12
+   E009,Ian,Sales,West,Mar,17000,55
+   E010,Jane,Marketing,North,Mar,9000,25
+   E011,Kevin,Sales,South,Mar,13000,45
+   E012,Laura,HR,West,Mar,3900,9
+```
 
 ### Example Questions You Can Ask
 
