@@ -168,7 +168,7 @@ if query:
         rows = retrieve_rows(query)
         insight = generate_insight(query, computed, rows)
         st.success(computed)
-        st.markdown("LLM Insight")     # (RAG-powered)
+        st.markdown("LLM Insight")     # using RAG
         st.write(insight)
 
 
