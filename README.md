@@ -2,7 +2,7 @@
 
 A Streamlit-based analytics assistant that allows users to upload CSV or Excel files and ask business questions in natural language.
 
-This project combines **deterministic data analytics** with a **Retrieval-Augmented Generation (RAG)** approach to provide accurate numerical results along with simple, human-readable explanations.
+This project combines deterministic data analytics with a RAG approach to deliver numerically accurate answers along with clear, business-friendly explanations powered by Google Gemini.
 
 ## Project Overview
 
@@ -15,8 +15,9 @@ All numerical calculations are performed using Pandas, while an LLM is used **on
 
 - Upload and preview CSV / Excel files
 - Automatic detection of numeric and categorical columns
-- Natural language question answering using RAG
+- Natural language Q&A using RAG
 - Deterministic analytics (count, sum, average, min, max)
+- RAG for contextual explanations
 - Simple chart generation
 - Executive summary statistics
 
@@ -26,7 +27,7 @@ All numerical calculations are performed using Pandas, while an LLM is used **on
 - **Data Processing:** Pandas, NumPy  
 - **Visualisation:** Matplotlib  
 - **Embeddings:** Sentence-Transformers (`all-MiniLM-L6-v2`)  
-- **LLM:** Hugging Face Inference API (FLAN-T5)  
+- **LLM:** Google Gemini (`gemini-2.5-flash`)  
 - **Retrieval:** Cosine similarity on row-level embeddings  
 
 
@@ -41,14 +42,14 @@ All numerical calculations are performed using Pandas, while an LLM is used **on
    ```bash
    pip install -r requirements.txt
 
-4. Add your Hugging Face API key:
+4. Add your Gemini API key:
    Create a file at:
    ```bash
    .streamlit/secrets.toml
 
  Add:
  
-    HF_API_KEY = "your_huggingface_api_key"
+    GEMINI_API_KEY = "your_gemini_api_key"
 
 6. Run the application:
    ```bash
@@ -76,14 +77,18 @@ The repository includes a sample CSV (sample.csv) with the following structure:
 ### Example Questions You Can Ask
 
 Using the sample dataset, users can ask questions such as:
+
 What is the total units sold?
+
 What is the average sales amount?
+
 What is the highest sales amount?
+
 How many employees are there?
 
-The application computes the numeric answer deterministically and then explains the result using relevant data rows.
+The app computes the numeric answer deterministically and then uses Gemini to explain the result using retrieved data rows.
 
-### How It Works (High Level)
+### Working
 
 Data is uploaded and lightly cleaned
 Column schema is inferred automatically
