@@ -2,8 +2,7 @@ streamlit
 pandas
 numpy
 matplotlib
-scikit-learn
-requests
 sentence-transformers
-torch
+scikit-learn
+google-genai
 
