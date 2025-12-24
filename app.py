@@ -2,41 +2,32 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import requests
 
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 
-HF_API_KEY = st.secrets["HF_API_KEY"]                #Hugging Face LLM Config
+from google import genai           ##gemini-2.5-flash
 
-HF_API_URL = (
-    "https://api-inference.huggingface.co/models/"
-    "google/flan-t5-base"
-)
+client = genai.Client(api_key=st.secrets["GEMINI_API_KEY"])   
 
-HF_HEADERS = {
-    "Authorization": f"Bearer {HF_API_KEY}",
-    "Content-Type": "application/json"
-}
 
 #Page setup
-
-st.set_page_config("Data-to-Insights RAG Agent", layout="wide")    
+st.set_page_config("Data-to-Insights RAG Agent", layout="wide")
 st.title("Data-to-Insights RAG Agent")
-st.caption("Deterministic Analytics + Agentic RAG (Hugging Face LLM)")
+st.caption("Deterministic Analytics + Agentic RAG (Gemini LLM)")
 
 
-file = st.file_uploader("Upload CSV / Excel", type=["csv", "xlsx"])            #Upload CSV / Excel
+#Upload CSV / Excel
+file = st.file_uploader("Upload CSV / Excel", type=["csv", "xlsx"])
 if not file:
     st.stop()
 
 df = pd.read_excel(file) if file.name.endswith("xlsx") else pd.read_csv(file)
 
-
-df.columns = [c.lower().strip().replace(" ", "_") for c in df.columns]          # Normalize column names
+# Normalize column names
+df.columns = [c.lower().strip().replace(" ", "_") for c in df.columns]
 
 #Basic Data Cleaning
-
 for c in df.columns:
     if df[c].dtype == object:
         df[c] = df[c].astype(str).fillna("unknown")
@@ -46,7 +37,6 @@ for c in df.columns:
 df = df.dropna(axis=1, how="all")
 
 #Schema inference
-
 def infer_schema(df):
     schema = {}
     for c in df.columns:
@@ -62,9 +52,7 @@ schema = infer_schema(df)
 numeric_cols = [c for c, v in schema.items() if v == "numeric"]
 category_cols = [c for c, v in schema.items() if v == "category"]
 
-
 #EDA
-
 st.subheader("Dataset Preview")
 st.dataframe(df.head())
 st.write("Shape:", df.shape)
@@ -73,9 +61,7 @@ with st.expander("EDA Summary"):
     st.write("**Numeric columns:**", numeric_cols)
     st.write("**Categorical columns:**", category_cols)
 
-
 #Embedding Model (Local)
-
 @st.cache_resource
 def load_embedder():
     return SentenceTransformer("all-MiniLM-L6-v2")
@@ -91,9 +77,7 @@ def best_column(query, cols):
     sims = cosine_similarity(q_emb, col_embeddings[idxs])[0]
     return cols[int(np.argmax(sims))]
 
-
-#RAG: Row Embeddings
-
+#RAG: Row Embedding
 df["row_text"] = df.astype(str).agg(" | ".join, axis=1)
 row_embeddings = embedder.encode(df["row_text"].tolist())
 
@@ -103,9 +87,7 @@ def retrieve_rows(query, k=5):
     top_idx = np.argsort(sims)[-k:][::-1]
     return df.iloc[top_idx]
 
-
-#Analytics Agent(Deterministic)
-
+#Deterministic Analytics Agent
 def compute_answer(query):
     q = query.lower()
 
@@ -135,34 +117,18 @@ def compute_answer(query):
             return f"Lowest {col}: {df[col].min():.2f}"
 
     return None
-
-
-#Insight Agent(LLM)
-
+    
+   #Gemini Insight Agent
 def call_llm(prompt):
-    payload = {
-        "inputs": prompt,
-        "parameters": {"max_new_tokens": 256}
-    }
+    try:
+        response = client.models.generate_content(
+            model="models/gemini-2.5-flash",
+            contents=prompt
+        )
+        return response.text.strip()
+    except Exception as e:
+        return str(e)   # TEMP: debug
 
-    r = requests.post(
-        HF_API_URL,
-        headers=HF_HEADERS,
-        json=payload,
-        timeout=60
-    )
-
-    if r.status_code != 200:
-        return "LLM temporarily unavailable. Showing deterministic result only."
-
-    result = r.json()
-
-    if isinstance(result, list) and result:
-        return result[0].get("generated_text", "")
-    elif isinstance(result, dict):
-        return result.get("generated_text", "")
-    else:
-        return "Empty LLM response."
 
 def generate_insight(question, computed_answer, retrieved_rows):
     context = "\n".join(retrieved_rows["row_text"].tolist())
@@ -187,9 +153,7 @@ Do NOT invent new numbers.
     return call_llm(prompt)
 
 
-#Q&A Interface
-
-st.markdown("---")
+st.markdown("---")            #Q&A Interface
 st.subheader("Ask a Business Question")
 
 query = st.text_input(
@@ -204,14 +168,12 @@ if query:
         rows = retrieve_rows(query)
         insight = generate_insight(query, computed, rows)
         st.success(computed)
-        st.markdown("Insights") #LLM insight RAG powered
+        st.markdown("###LLM Insight (RAG-powered)")
         st.write(insight)
 
 
-#Chart Builder
-
 st.markdown("---")
-st.subheader("Chart Builder")
+st.subheader("Chart Builder")   #Chart Builder
 
 if category_cols and numeric_cols:
     x = st.selectbox("X-axis (category)", category_cols)
@@ -226,10 +188,9 @@ if category_cols and numeric_cols:
         st.pyplot(fig)
 
 
-#Executive Insight Report
 
 st.markdown("---")
-st.subheader("Executive Insight Report")
+st.subheader("Executive Insight Report")   #Executive Insight Report
 
 if st.button("Generate Report"):
     st.write(f"Dataset contains **{df.shape[0]} rows** and **{df.shape[1]} columns**.")
